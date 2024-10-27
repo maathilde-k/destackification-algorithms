@@ -1318,3 +1318,93 @@ end
 function convertToInt(A)
     return map(x->Int(numerator(x)), A)
 end
+
+"""
+  coneContains(::Array{Int64,1},::Array{Int64,1})
+    
+    Checks whether every index in the first input is also contained in the second input. 
+    
+# Examples
+```jldoctest
+julia> coneContains([1,2,3],[1,2,3,4])
+true
+julia> coneContains([1,2,5],[1,2,3,4])
+false
+```
+"""
+
+function coneContains(A::Array{Int64,1},B::Array{Int64,1})
+    return issubset(A, B)
+end
+
+
+"""
+    minMaxDivisorial(::StackyFan,::Dict)
+    
+    Calculates the maximal divisorial index of all cones in a stacky fan. 
+    Each maximal cone of the fan will contain at most one minimal subcone of maximal divisorial index; a list of such cones is returned.
+
+# Examples
+```jldoctest
+julia> F=makeStackyFan([1 2 0;1 3 0; 3 0 1],[[0,1,2]],[1,1,5]);
+    
+julia> div=Dict([1,2,0]=>0,[1,3,0]=>0,[3,0,1]=>0);
+    
+julia> minMaxDivisorial(F,div)
+[[3]]
+    
+julia> F=makeStackyFan([1 1 0;1 3 0; 3 0 1],[[0,1,2]],[1,1,5]);
+
+julia> div=Dict([1,1,0]=>0,[1,3,0]=>0,[3,0,1]=>0);
+    
+julia> minMaxDivisorial(F,div)
+[[1,2,3]]
+```
+""" 
+function minMaxDivisorial(F::StackyFan,div::Dict{Vector{QQFieldElem}, Int64})
+    # Calculates the maximal divisorial index of any cone in the fan
+    divMax=0
+    coneList=getCones(F.fan)
+    # dictionary that represents each cone with its divisorial index
+    divisorialDict=Dict()
+    for cone in coneList
+        d=divisorialIndex(cone,F,div)
+        divisorialDict[cone]=d
+        if d>divMax
+            divMax=d
+        end
+    end 
+    if divMax==0
+        return nothing
+    end
+
+    # cones with maximal divisorial index
+    divMaxCones=Array{Int64,1}[]
+    for cone in coneList
+        if divisorialDict[cone]==divMax
+             # if the cone's divisorial index is the fan's maximal divisorial index, add the cone to divMaxCones
+            push!(divMaxCones,cone)
+        end
+    end
+
+    #divMaxConesRefined stores the cones in divMaxCones that are minimal with respect to inclusion
+    divMaxConesRefined=Array{Int64,1}[]
+    # List of maximal cones in F
+    maxconeList=getMaximalCones(F.fan)
+    for maxcone in maxconeList
+        # if the div index of the current maxcone is the fan's max div index, its minimal subcone with maximal divisorial index is calculated
+        if divisorialDict[maxcone]==divMax
+            maxconeContains=Array{Int64,1}[]
+            mincone=maxcone
+            for cone in divMaxCones
+                if coneContains(cone,maxcone) && size(cone,1)<size(mincone,1)
+                    mincone=cone
+                end
+            end
+            if !(mincone in divMaxConesRefined)
+                push!(divMaxConesRefined,mincone)
+            end
+        end
+    end
+    return divMaxConesRefined
+end
