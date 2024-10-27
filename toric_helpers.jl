@@ -1605,3 +1605,121 @@ function positiveDivIndexCone(divisor::Array{QQFieldElem,1}, F::StackyFan, div::
     return false
 end
 
+######################################### HELPERS FOR E #########################################
+
+#make a matrix where the distinguished rays come first, then the non distinguished
+
+function matrixDistCone(Dlist::Vector{Int64},F::StackyFan)
+    rays = map(x->Array{QQFieldElem}(Polymake.common.primitive(x)),getRays(F.fan))
+    raysSubset = [rays[i] for i in Dlist]
+    return listToMatrix(raysSubset)
+end
+
+
+function makeMatrix(L::Array{Int64}, F::StackyFan)
+    rays = getRays(F.fan)
+    listMatrix = Array{Array{QQFieldElem}}([])
+    for i in L
+        push!(listMatrix, rays[i])
+    end
+    return listToMatrix(listMatrix)
+end
+
+
+function invAndInt(A::AbstractArray)
+    if isinvertible(A)
+        if findall(x-> x==false,map(x->isinteger(x),A)) == CartesianIndex{2}[]
+            return true
+        end
+    end
+    return false
+end
+
+
+function compareDistCones(cone1::Vector{Int64}, cone2::Vector{Int64}, F::StackyFan,div::Array{Int64})
+
+    Dlist = Array{Int64}([])
+    n = size(getRays(F.fan),1)
+
+    for i in [1:1:n;]
+        if div[i] == 1
+            push!(Dlist, i)
+        end
+    end
+
+    intersection1 = filter(x->x in Dlist, cone1)
+    intersection2 = filter(x-> x in Dlist, cone2)
+    complement1 = filter(x -> !(x in intersection1), [1:1:n;])
+    complement2 = filter(x -> !(x in intersection1), [1:1:n;])
+    permutations1 = collect(permutations(complement1))
+    full2 = append!(intersection2, complement2)
+    matrix2 = makeMatrix(full2, F)
+    
+    if intersection1 == intersection2
+        for perms in permutations1
+            full1 = append!(intersection1, perms)
+            matrix1 = makeMatrix(full1, F)
+            if isinvertible(matrix1) && isinvertible(matrix2)
+                matrixToCheck1= *(matrix1, inv(matrix2))
+                matrixToCheck2= *(matrix2, inv(matrix1))
+                if invAndInt(matrixToCheck1) && invAndInt(matrixToCheck2)
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
+
+function aggregrate(cone::Vector{Int64},F::StackyFan,div::Dict{Vector{QQFieldElem}, Int64}))
+    return (independencyIndex(cone,listToMatrix(getRays(F.fan))), toroidalIndex(cone, F,div))
+end
+
+
+function minMaxAggregate(F::StackyFan,div::Dict{Vector{QQFieldElem}, Int64}), order::Dict{Vector{Int64},Int64})
+    # Calculates the maximal divisorial index of any cone in the fan
+    divMax=(0,0,0)
+    coneList=getCones(F.fan)
+    # dictionary that represents each cone with its divisorial index
+    divisorialDict=Dict()
+    divMaxCones=[]
+    for cone in coneList
+        d=aggregrate(cone,F,div)#,order)
+        divisorialDict[cone]=d
+        if d>divMax
+            divMax=d
+            divMaxCones=Array{Int64,1}[]
+            push!(divMaxCones,cone)
+        end
+        if d == divMax && !(cone in divMaxCones)
+            push!(divMaxCones,cone)
+        end 
+    end
+    
+    if divMax==(0,0,0)
+        return nothing
+    end
+    
+    #divMaxConesRefined stores the cones in divMaxCones that are minimal with respect to inclusion
+    divMaxConesRefined=[]
+    # List of maximal cones in F
+    maxconeList=getMaximalCones(F.fan)
+    for maxcone in maxconeList
+        # if the div index of the current maxcone is the fan's max div index, its minimal subcone with maximal divisorial index is calculated
+        if divisorialDict[maxcone]==divMax
+            mincone=maxcone
+            for cone in divMaxCones
+                if coneContains(cone,mincone) && size(cone,1)<size(mincone,1)
+                    mincone=cone
+                end
+            end
+            
+            if !(mincone in divMaxConesRefined)
+                mincone = Array{Int64}(mincone)
+                push!(divMaxConesRefined,mincone)
+            end
+        end
+    end
+    return divMaxConesRefined
+end
