@@ -7,3 +7,5 @@ For a introductory treatment of a simpler result, you may consult the notes by A
 
 ## Acknowledgements
 Thank you to Dan Abramovich for allowing us to work with him on this project and for providing the necessary guidance throughout.
+
+This repository is the continutation of the existing work in this repository [destackification](https://github.com/nbenabla/destackification) by former Brown students. We appreciate all their hard work on this project!
