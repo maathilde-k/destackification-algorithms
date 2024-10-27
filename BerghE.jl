@@ -1,25 +1,10 @@
 function BerghE(F::StackyFan, divlist::Array{Int64,1})
-
-    maximalCones = getMaximalCones(F.fan)
-    orderOnMaximalCones = Dict{Vector{Int64},Int64}()
-    i=0
-    for maximalCone in maximalCones
-        orderOnMaximalCones[maximalCone] = i
-        i += 1
-    end
-
-    cones = getCones(F.fan)
-    order = Dict{Vector{Int64},Int64}()
-    for cone in cones
-        indexMaximalCone = findall(x -> issubset(Set(cone),Set(x)), maximalCones)[1]
-        order[cone] = orderOnMaximalCones[maximalCones[indexMaximalCone]]
-    end
     
     X = deepcopy(F)
     slicedRayMatrix = getRays(X.fan)
     maximalCones = getMaximalCones(X.fan)
+    
     # Populate dictionary of divisorial rays (div) from divlist
-
     distVect=Dict{Vector{QQFieldElem}, Int64}()
     for i in 1:size(slicedRayMatrix,1)
         distVect[slicedRayMatrix[i]]=divlist[i]
