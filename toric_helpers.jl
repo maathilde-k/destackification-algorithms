@@ -1677,7 +1677,7 @@ function aggregrate(cone::Vector{Int64},F::StackyFan,div::Dict{Vector{QQFieldEle
 end
 
 
-function minMaxAggregate(F::StackyFan,div::Dict{Vector{QQFieldElem}, Int64}), order::Dict{Vector{Int64},Int64})
+function minMaxAggregate(F::StackyFan,div::Dict{Vector{QQFieldElem}, Int64})
     # Calculates the maximal divisorial index of any cone in the fan
     divMax=(0,0,0)
     coneList=getCones(F.fan)
