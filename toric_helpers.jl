@@ -1319,6 +1319,8 @@ function convertToInt(A)
     return map(x->Int(numerator(x)), A)
 end
 
+####################### HELPERS FOR C #######################
+
 """
   coneContains(::Array{Int64,1},::Array{Int64,1})
     
