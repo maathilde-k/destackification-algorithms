@@ -1,3 +1,5 @@
+include("toric_helpers.jl")
+
 """
     BerghC(::StackyFan,::Array{Int64,1})
     
