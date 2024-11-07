@@ -1,3 +1,7 @@
+include("toric_helpers.jl")
+include("BerghA.jl")
+include("BerghD.jl")
+
 function BerghE(F::StackyFan, divlist::Array{Int64,1})
     
     X = deepcopy(F)
