@@ -1,3 +1,5 @@
+include("toric_helpers.jl")
+
 function BerghD(F::StackyFan,divlist::Array{Int64,1}, Dlist::Array{Int64,1})
     X=deepcopy(F)
     slicedRayMatrix=getRays(X.fan)
