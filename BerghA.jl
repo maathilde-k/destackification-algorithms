@@ -218,6 +218,12 @@ function BerghA(F::StackyFan,D::Array{Int64,1};verbose::Bool=false)
     return X,D
 end
 
+"""
+BerghAmod(F::StackyFan,D::Array{Int64,1})
+
+Given a stacky fan F and a vector of booleans D representing the distinguished structure, returns a smooth stacky fan where the distinguished rays are independent, and a list recording the steps taken.
+
+"""
 function BerghAmod(F::StackyFan,D::Array{Int64,1};verbose::Bool=false)
     if verbose==true
         println("==algorithm is running in verbose mode==")
@@ -398,6 +404,12 @@ function getIndex(L, v)
     return i
 end
 
+"""
+BerghAmod(F::StackyFan,D::Array{Int64,1})
+
+Given a stacky fan F, a vector of booleans D representing the distinguished structure and a list of stacky modifications, returns a smooth stacky fan where the distinguished rays are independent following the instructions given by the list of stacky modifications.
+
+"""
 function manualBerghA(F::StackyFan,D::Array{Int64,1}, manual)
     X = deepcopy(F)
     for instruction in manual
