@@ -5,9 +5,11 @@ include("BerghD.jl")
 """
     BerghE(F::StackyFan,divlist::Array{Int64,1})
 
-Given a stacky fan F and a vector of booleans divlist representing the distinguished structure, returns the result of a sequence of smooth stacky blowups such that the independency index is 0 everywhere at each step.
+Given a stacky fan F and a vector of booleans divlist representing the distinguished structure, 
+returns the result of a sequence of smooth stacky blowups such that the independency index is 0 everywhere at each step.
 
 The algorithm is adapted from Daniel Bergh's [paper on destackification](https://arxiv.org/abs/1409.5713). 
+
 # Examples
 
 """
